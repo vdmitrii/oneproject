@@ -2,11 +2,10 @@ stages:
   get_data:
     cmd: python src/data/get_data.py ${data.RAW_DATA_PATH} ${data.DATA_PATH}
     deps:
-      - data/raw/data.xlsx
       - src/data/get_data.py
     params:
-      - data.RAW_DATA_PATH
       - data.DATA_PATH
+      - data.RAW_DATA_PATH
     outs:
       - data/processed/data.csv
 
@@ -31,8 +30,6 @@ stages:
       - data.FEATURED_DATA_PATH
     outs:
       - data/processed/data_featured.csv
-
-
 
   prepare_datasets:
     cmd: python src/data/prepare_datasets.py ${data.FEATURED_DATA_PATH} ${data.TRAIN_FILE_PATH} ${data.TEST_FILE_PATH}
@@ -71,4 +68,11 @@ stages:
     outs:
       - reports/scores.csv
 
-      
+  s3upload:
+    cmd: python src/models/upload_model.py ${data.MODEL_FILE_PATH}
+    deps:
+      - src/models/upload_model.py
+      - models/catboost_model.cbm
+    params:
+      - data.MODEL_FILE_PATH
+    

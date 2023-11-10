@@ -6,12 +6,14 @@ import pandas as pd
 import click
 from botocore.exceptions import ClientError
 
+
 @click.command()
-@click.argument("input_path", type=click.Path())
-@click.argument("output_path", type=click.Path())
-def get_data(input_path: str, output_path: str):
+@click.argument("input_path", type=click.Path(exists=True))
+def upload_model(input_path: str):
     bucket_name = 'junk'
+    file_name = 'models/catboost_model.cbm'
     session = boto3.session.Session()
+
     ENDPOINT = "https://storage.yandexcloud.net"
 
     session = boto3.Session(
@@ -20,16 +22,10 @@ def get_data(input_path: str, output_path: str):
         region_name="ru-central1",
     )
     s3 = session.client("s3", endpoint_url=ENDPOINT)
-    
-    with open(input_path, "wb") as f:
-            s3.download_fileobj(bucket_name, 'data/data.xlsx', f)
-            
-    df = pd.read_excel(input_path, usecols=['date', 'time_interval', 'quantity'])
-    click.echo(f'Selected {len(df)} samples.')
-    
-    df.to_csv(output_path, index=False)
+    with open(file_name, "rb") as f:
+            s3.upload_fileobj(f, bucket_name, "model/catboost_model.cbm")
 
 
 if __name__ == "__main__":
     load_dotenv()
-    get_data()
+    upload_model()
