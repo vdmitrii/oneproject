@@ -43,14 +43,10 @@ stages:
   get_data:
     cmd: python src/data/get_data.py data/raw/data.xlsx data/processed/data.csv
     deps:
-    - path: data/raw/data.xlsx
-      hash: md5
-      md5: e8c921732ee342abef98b3456c11aa42
-      size: 179766
     - path: src/data/get_data.py
       hash: md5
-      md5: 1cd279107351f880262e6030a1cb19f5
-      size: 430
+      md5: 8aa0eb952a45228cb7a3c45964f7ed9c
+      size: 1033
     params:
       params.yaml:
         data.DATA_PATH: data/processed/data.csv
@@ -149,3 +145,17 @@ stages:
       hash: md5
       md5: 0a5da269b6c0d20eb8057156d940343c
       size: 47
+  s3upload:
+    cmd: python src/models/upload_model.py models/catboost_model.cbm
+    deps:
+    - path: models/catboost_model.cbm
+      hash: md5
+      md5: 5b2c1f302f28704c3836825b36a2acaf
+      size: 1086816
+    - path: src/models/upload_model.py
+      hash: md5
+      md5: f4d867493bbc8e8ec8836416630e27ac
+      size: 845
+    params:
+      params.yaml:
+        data.MODEL_FILE_PATH: models/catboost_model.cbm
