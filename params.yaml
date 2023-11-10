@@ -1,0 +1,14 @@
+data:
+  RAW_DATA_PATH: "data/raw/data.xlsx"
+  DATA_PATH: "data/processed/data.csv"
+  CLEANED_DATA_PATH: "data/processed/data_cleaned.csv"
+  FEATURED_DATA_PATH: "data/processed/data_featured.csv"
+  TRAIN_FILE_PATH: "data/processed/train.csv"
+  TEST_FILE_PATH: "data/processed/test.csv"
+  MODEL_FILE_PATH: "models/catboost_model.cbm"
+  SCORE_FILE_PATH: "reports/scores.csv"
+
+prep:
+  split: 0.20
+  seed: 20170428
+  split_date: '2023-06-01'

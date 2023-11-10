@@ -1,0 +1,74 @@
+stages:
+  get_data:
+    cmd: python src/data/get_data.py ${data.RAW_DATA_PATH} ${data.DATA_PATH}
+    deps:
+      - data/raw/data.xlsx
+      - src/data/get_data.py
+    params:
+      - data.RAW_DATA_PATH
+      - data.DATA_PATH
+    outs:
+      - data/processed/data.csv
+
+  clean_data:
+    cmd: python src/data/clean_data.py ${data.DATA_PATH} ${data.CLEANED_DATA_PATH}
+    deps:
+      - data/processed/data.csv
+      - src/data/clean_data.py
+    params:
+      - data.DATA_PATH
+      - data.CLEANED_DATA_PATH
+    outs:
+      - data/processed/data_cleaned.csv
+
+  add_features:
+    cmd: python src/features/add_features.py ${data.CLEANED_DATA_PATH} ${data.FEATURED_DATA_PATH}
+    deps:
+      - data/processed/data_cleaned.csv
+      - src/features/add_features.py
+    params:
+      - data.CLEANED_DATA_PATH
+      - data.FEATURED_DATA_PATH
+    outs:
+      - data/processed/data_featured.csv
+
+
+
+  prepare_datasets:
+    cmd: python src/data/prepare_datasets.py ${data.FEATURED_DATA_PATH} ${data.TRAIN_FILE_PATH} ${data.TEST_FILE_PATH}
+    deps:
+      - data/processed/data_featured.csv
+      - src/data/prepare_datasets.py
+    params:
+      - data.FEATURED_DATA_PATH
+      - data.TRAIN_FILE_PATH
+      - data.TEST_FILE_PATH
+      - prep.split_date
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+
+  train:
+    cmd: python src/models/train.py ${data.TRAIN_FILE_PATH} ${data.MODEL_FILE_PATH}
+    deps:
+      - data/processed/train.csv
+      - src/models/train.py
+    params:
+      - data.TRAIN_FILE_PATH
+      - data.MODEL_FILE_PATH
+    outs:
+      - models/catboost_model.cbm
+
+  predict:
+    cmd: python src/models/predict.py ${data.TEST_FILE_PATH} ${data.MODEL_FILE_PATH} ${data.SCORE_FILE_PATH}
+    deps:
+      - src/models/predict.py
+      - models/catboost_model.cbm
+    params:
+      - data.TEST_FILE_PATH
+      - data.SCORE_FILE_PATH
+      - data.MODEL_FILE_PATH
+    outs:
+      - reports/scores.csv
+
+      
