@@ -25,12 +25,12 @@ stages:
     deps:
     - path: data/processed/data.csv
       hash: md5
-      md5: ec64ad25e1205056f8c68166c0b95b65
-      size: 186413
+      md5: 088b01eca4b5846dc866f1fe37ec130f
+      size: 176070
     - path: src/data/clean_data.py
       hash: md5
-      md5: 7e1d2491cc12c38a50473b6e45b40307
-      size: 541
+      md5: 41ef4c29f3fdb6c765f9b264e5876414
+      size: 522
     params:
       params.yaml:
         data.CLEANED_DATA_PATH: data/processed/data_cleaned.csv
@@ -38,8 +38,8 @@ stages:
     outs:
     - path: data/processed/data_cleaned.csv
       hash: md5
-      md5: 610d94f28235d8266cff2fabbf5beab6
-      size: 207163
+      md5: e6b595a68ca30b80b104ca9408312931
+      size: 196820
   get_data:
     cmd: python src/data/get_data.py data/raw/data.xlsx data/processed/data.csv
     deps:
@@ -49,8 +49,8 @@ stages:
       size: 179766
     - path: src/data/get_data.py
       hash: md5
-      md5: 2ef0f813d7c696be3dc9c3fb2a1ec36c
-      size: 447
+      md5: 1cd279107351f880262e6030a1cb19f5
+      size: 430
     params:
       params.yaml:
         data.DATA_PATH: data/processed/data.csv
@@ -58,8 +58,8 @@ stages:
     outs:
     - path: data/processed/data.csv
       hash: md5
-      md5: ec64ad25e1205056f8c68166c0b95b65
-      size: 186413
+      md5: 088b01eca4b5846dc866f1fe37ec130f
+      size: 176070
   add_features:
     cmd: python src/features/add_features.py data/processed/data_cleaned.csv data/processed/data_featured.csv
     deps:
