@@ -24,6 +24,12 @@ st-files-connection = "^0.1.0"
 gunicorn = "^21.2.0"
 schedule = "^1.2.1"
 load-dotenv = "^0.1.0"
+python-multipart = "^0.0.6"
+uvicorn = "^0.24.0.post1"
+pydantic-settings = "^2.0.3"
+holidays = "^0.36"
+sphinx = "^7.2.6"
+poetry-plugin-export = "^1.6.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"

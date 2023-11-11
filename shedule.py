@@ -17,7 +17,6 @@ def job():
         print(f"Код ошибки: {e.returncode}")
         print(f"STDERR: {e.stderr}")
 
-schedule.every().minute.do(job)
 # schedule.every().day.at("00:00").do(job)
 # schedule.every().day.at("12:42", "Europe/Moscow").do(job)
 

@@ -10,5 +10,5 @@ data:
 
 prep:
   split: 0.20
-  seed: 20170428
-  split_date: '2023-06-01'
+  seed: 42
+  split_date: '2023-10-02'
