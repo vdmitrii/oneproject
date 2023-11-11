@@ -1,0 +1,8 @@
+streamlit
+s3fs
+st-files-connection
+boto3
+holidays
+pandas
+numpy
+catboost

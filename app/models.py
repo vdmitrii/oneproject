@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 
 class PredictionInput(BaseModel):
-    date_string: List[str]
+    date_string: file
 
 
 class PredictionOutput(BaseModel):
@@ -20,13 +20,11 @@ class ForecastModel:
 
     def load_model(self):
         """Loads the model"""
-        model_file = os.path.join(os.path.dirname(__file__), "catboost_model.cbm")
-        model = CatBoostRegressor()      # parameters not required.
-        model.load_model(model_file)
+        model_file = "models/catboost_model.cbm"
+        regr = CatBoostRegressor()
+        model = regr.load_model(model_file)
         
-        loaded_model: bytes = c.load(model_file)
-        model, targets = loaded_model
-        self.model = loaded_model
+        self.model = model
 
 
     async def predict(self, input: PredictionInput) -> PredictionOutput:
@@ -34,5 +32,5 @@ class ForecastModel:
         if not self.model:
             raise RuntimeError("Модель не загружена")
         
-        prediction = self.model.predict([input])
+        prediction = self.model.predict()
         return PredictionOutput(quantity=prediction)
