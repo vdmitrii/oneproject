@@ -12,7 +12,7 @@ import holidays
 from catboost import CatBoostRegressor
 import numpy as np
 
-load_dotenv()
+# load_dotenv()
 
 
 # conn = st.connection('s3', type=FilesConnection)
@@ -23,7 +23,7 @@ get_model()
 
 st.title("Предсказание на конкретную дату")
 d = st.date_input("Дата предсказания", datetime.date(2023, 10, 22))
-st.write('Прогноз на:', d)
+# st.write('Прогноз на:', d)
     
 # @st.cache_resource
 def predict_date():
@@ -33,13 +33,13 @@ def predict_date():
             st.error("Вы ничего не передали!", icon="🚨")
         elif d:
             model = CatBoostRegressor()
-            model.load_model("front/catboost_model.cbm", format="cbm")
+            model.load_model("catboost_model.cbm", format="cbm")
             target_date = pd.DataFrame({'date': pd.to_datetime(24 * [d]),
                                 'time_interval': np.arange(0, 24)})
             
             target_date = add_features(target_date)
             target_pred = model.predict(target_date)
-            target_pred_df = pd.DataFrame(target_pred)
+            target_pred_df = pd.DataFrame(np.ceil(target_pred))
             with st.expander("График"):
                 st.bar_chart(target_pred_df)
     
@@ -73,15 +73,15 @@ def predict_file():
             st.error("Вы ничего не загрузили", icon="🚨")
         else:
             model = CatBoostRegressor()
-            model.load_model("front/catboost_model.cbm", format="cbm")
+            model.load_model("catboost_model.cbm", format="cbm")
    
             data = pd.read_csv(uploaded_file)
             df = data.copy()
-            st.write(df)
+            # st.write(df)
             df['date'] = pd.to_datetime(df['date'])
             df = add_features(df)
             preds = model.predict(df)
-            preds_df = pd.DataFrame(preds, df.index, columns=['pred'])
+            preds_df = pd.DataFrame(np.ceil(preds), df.index, columns=['pred'])
             
             st.write(preds_df)
 

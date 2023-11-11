@@ -10,26 +10,48 @@ services:
     volumes:
         - ./front:/app
 
-  web:
+  sheduler:
     build:
-      context: ./yts
-      dockerfile: Dockerfile.prod
-    command: uvicorn app.main:app --reload --workers 4 --host 0.0.0.0 --port 8000
+      context: ./sheduler
+      dockerfile: Dockerfile
+    restart: always
     volumes:
-      - ./yts:/usr/src/app
-    ports:
-      - 8004:8000
+        - ./sheduler:/app
+
+  restarter:
+    image: docker:cli
+    restart: unless-stopped
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    entrypoint: ["/bin/sh","-c"]
+    command:
+      - |
+        while true; do
+          if [ "$(date +'%H:%M')" = '00:00' ]; then
+            docker restart frontend
+          fi
+          sleep 60
+        done
+
+  # web:
+  #   build:
+  #     context: ./app
+  #     dockerfile: Dockerfile.prod
+  #   command: uvicorn app.main:app --reload --workers 4 --host 0.0.0.0 --port 8000
+  #   volumes:
+  #     - ./app:/usr/src/app
+  #   ports:
+  #     - 8004:8000
     # environment:
     #   - ENVIRONMENT=dev
     #   - TESTING=0
     #   - DATABASE_URL=postgres://postgres:postgres@web-db:5432/web_dev
     #   - DATABASE_TEST_URL=postgres://postgres:postgres@web-db:5432/web_test
-    depends_on:
-      - web-db
+    # depends_on:
+    #   - web-db
 
   # web-db:
   #   build:
-  #     context: ./yts/db
+  #     context: ./app/db
   #     dockerfile: Dockerfile
   #   expose:
   #     - 5432

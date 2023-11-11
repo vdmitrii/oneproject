@@ -48,5 +48,5 @@ def get_model():
         region_name="ru-central1",
     )
     s3 = session.client("s3", endpoint_url=ENDPOINT)
-    with open('front/catboost_model.cbm', "wb") as f:
+    with open('catboost_model.cbm', "wb") as f:
             s3.download_fileobj(bucket_name, 'model/catboost_model.cbm', f)

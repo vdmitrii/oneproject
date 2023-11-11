@@ -6,6 +6,11 @@ from app.config import get_settings, Settings
 from models import PredictionInput, PredictionOutput, ForecastModel
 from catboost import CatBoostRegressor
 
+# import mlflow
+
+logged_model = f's3://mlflow-models-alexey/1/{RUN_ID}/artifacts/model'
+# logged_model = f'runs:/{RUN_ID}/model'
+model = mlflow.pyfunc.load_model(logged_model)
 
 log = logging.getLogger("uvicorn")
 # memory = joblib.Memory(location="cache.joblib")
