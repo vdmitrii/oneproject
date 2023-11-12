@@ -112,8 +112,8 @@ stages:
       size: 536867
     - path: src/models/train.py
       hash: md5
-      md5: c11b1b71ed51754c7eaddd77e61a5547
-      size: 3742
+      md5: fc91b2a5dcbe0ac6c40c3d80ae99d1d1
+      size: 3501
     params:
       params.yaml:
         data.MODEL_FILE_PATH: models/catboost_model.cbm
@@ -121,8 +121,8 @@ stages:
     outs:
     - path: models/catboost_model.cbm
       hash: md5
-      md5: 08d6cb80819489145b48db64d260429d
-      size: 1489048
+      md5: 48379557f28c153ac0b6d098b84b67b6
+      size: 1489248
   predict:
     cmd: python src/models/predict.py data/raw/data.csv models/catboost_model.cbm
       data/predictions/preds.csv
@@ -133,12 +133,12 @@ stages:
       size: 155043
     - path: models/catboost_model.cbm
       hash: md5
-      md5: 08d6cb80819489145b48db64d260429d
-      size: 1489048
+      md5: 48379557f28c153ac0b6d098b84b67b6
+      size: 1489248
     - path: src/models/predict.py
       hash: md5
-      md5: 3d74d02419864f5d15081e8d19a3f224
-      size: 2260
+      md5: 6533dbc13312074d80eccfd7af9cedee
+      size: 2171
     params:
       params.yaml:
         data.MODEL_FILE_PATH: models/catboost_model.cbm
@@ -147,8 +147,8 @@ stages:
     outs:
     - path: data/predictions/preds.csv
       hash: md5
-      md5: 235ae039191305647d845afc5ab9349d
-      size: 192830
+      md5: 5bf0623184126c778f5df9e27e5e2835
+      size: 192569
   s3upload:
     cmd: python src/models/upload_model.py models/catboost_model.cbm
     deps:
@@ -158,8 +158,8 @@ stages:
       size: 192830
     - path: src/models/upload_model.py
       hash: md5
-      md5: 7a49cb74cd074d9ba572c61c5878b9b9
-      size: 1219
+      md5: f7db71606c317e09a099a4f6d361316f
+      size: 987
     params:
       params.yaml:
         data.MODEL_FILE_PATH: models/catboost_model.cbm

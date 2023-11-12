@@ -69,11 +69,11 @@ stages:
     outs:
       - data/predictions/preds.csv
 
-  s3upload:
-    cmd: python src/models/upload_model.py ${data.MODEL_FILE_PATH}
-    deps:
-      - src/models/upload_model.py
-      - data/predictions/preds.csv
-    params:
-      - data.MODEL_FILE_PATH
+  # s3upload:
+  #   cmd: python src/models/upload_model.py ${data.MODEL_FILE_PATH}
+  #   deps:
+  #     - src/models/upload_model.py
+  #     - data/predictions/preds.csv
+  #   params:
+  #     - data.MODEL_FILE_PATH
     

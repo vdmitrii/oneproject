@@ -39,7 +39,7 @@ def predict_date():
             
             target_date = add_features(target_date)
             target_pred = model.predict(target_date)
-            target_pred_df = pd.DataFrame(np.ceil(target_pred))
+            target_pred_df = pd.DataFrame(np.round(target_pred, 0))
             with st.expander("График"):
                 st.bar_chart(target_pred_df)
     
@@ -79,9 +79,11 @@ def predict_file():
             df = data.copy()
             # st.write(df)
             df['date'] = pd.to_datetime(df['date'])
+            date = df.date.dt.strftime('%d-%m-%Y')
+            interv = df.time_interval
             df = add_features(df)
             preds = model.predict(df)
-            preds_df = pd.DataFrame(np.ceil(preds), df.index, columns=['pred'])
+            preds_df = pd.DataFrame({"date": date, "interval": interv, "predictions": np.round(preds, 0)})
             
             st.write(preds_df)
 

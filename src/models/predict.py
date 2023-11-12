@@ -6,11 +6,14 @@ import numpy as np
 from typing import List
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import holidays
-import mlflow
+# import mlflow
 # import os, sys
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # from features.add_features import add_features
 
+
+# MLFLOW_TRACKING_URI="http://0.0.0.0:9000"
+# MODEL_RUN_ID="b18c0cf8515400abd63e251ca588630"
 
 def add_features(df):
     df.fillna(0, inplace=True)
@@ -50,14 +53,10 @@ def predict(input_paths: List[str], output_path: str):
     model.load_model(input_paths[1])
     predics = model.predict(df.values)
 
-    # logged_model = 'runs:/d981dd2939c748fe9c7142dde9c832a8/model'
-    # loaded_model = mlflow.catboost.load_model(logged_model)
-    # loaded_model.predict(pd.DataFrame(data_test))
-    
     predics_df = pd.DataFrame(predics)
     predics_df.to_csv(output_path, index=False)
     
-    mlflow.log_artifact(output_path)
+    # mlflow.log_artifact(output_path)
 
 if __name__ == "__main__":
     predict()
