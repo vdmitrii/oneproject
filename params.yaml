@@ -1,5 +1,5 @@
 data:
-  RAW_DATA_PATH: "data/raw/data.xlsx"
+  RAW_DATA_PATH: "data/raw/data.csv"
   DATA_PATH: "data/processed/data.csv"
   CLEANED_DATA_PATH: "data/processed/data_cleaned.csv"
   FEATURED_DATA_PATH: "data/processed/data_featured.csv"
@@ -7,7 +7,7 @@ data:
   TEST_FILE_PATH: "data/processed/test.csv"
   MODEL_FILE_PATH: "models/catboost_model.cbm"
   SCORE_FILE_PATH: "reports/scores.csv"
-
+  PREDS_FILE_PATH: "data/predictions/preds.csv"
 prep:
   split: 0.20
   seed: 42

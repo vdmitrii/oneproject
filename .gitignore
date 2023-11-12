@@ -21,3 +21,5 @@ venv
 catboost_info/
 
 **/__pycache__/
+sheduler/
+mlruns

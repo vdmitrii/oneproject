@@ -7,68 +7,112 @@ from typing import List
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import mlflow
 from mlflow import MlflowClient
-from mlflow.models.signature import infer_signature
+from mlflow.models import infer_signature
+from mlflow.models.signature import ModelSignature
+from mlflow.types.schema import Schema, ColSpec
+from scipy import stats
 import os
+from datetime import datetime
 from dotenv import load_dotenv
+import sys    
 
 
 load_dotenv()
+
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-mlflow.set_experiment("Forecaster")
+exp_name = f"Catboost Experiment"
+# mlflow.create_experiment(exp_name)
 
 @click.command()
 @click.argument("input_path", type=click.Path(exists=True))
 @click.argument("output_path", type=click.Path())
 def train(input_path: str, output_path: str):
+    mlflow.set_experiment(exp_name)
     with mlflow.start_run():
         mlflow.get_artifact_uri()
+        
+        click.echo(mlflow.get_artifact_uri())
+        click.echo(f'Разбиваем на train и test')
+        df = pd.read_csv(input_path)
+        train = df.sample(frac=0.8, random_state=42)
+        test = df.drop(train.index)
 
-        train_df = pd.read_csv(input_path)
+        X = train.drop(['date', 'quantity'], axis=1)
+        y = train['quantity']
 
-        X_train = train_df.drop(['date', 'quantity'], axis=1)
-        y_train = train_df['quantity']
-    
-        clf = CatBoostRegressor(thread_count=-1,
-                                loss_function='MAE',
-                                random_seed=42)
+        click.echo(f'Случайный поиск лучших параметров')       
+        model = CatBoostRegressor(
+            iterations=5000,
+            random_seed=42,
+            thread_count=-1,
+            loss_function="MAE",
+            eval_metric="MAE",
+            verbose=500,
+            )
 
-        clf.fit(
-            X_train,
-            y_train,
-            # eval_set=(X_test, y_test),
-            verbose=200,
-            # use_best_model=True,
-            plot=False,
-            early_stopping_rounds=100,
+        param_distribution = {
+            "one_hot_max_size": stats.bernoulli(p=0.2, loc=2),
+            "learning_rate": [0.03, 0.1, 0.3],
+            "l2_leaf_reg": [2, 5, 7],
+            "depth": stats.binom(n=10, p=0.2),
+        }
+        randomized_search_result = model.randomized_search(param_distribution, X, y)
+        searched_params = randomized_search_result["params"]
+        mlflow.log_params(searched_params)
+        
+        model = CatBoostRegressor(
+            iterations=5000,
+            random_seed=42,
+            thread_count=-1,
+            loss_function="MAE",
+            eval_metric="MAE",
+            verbose=500,
+            **searched_params
         )
 
-        params = {
-            'l2_leaf_reg': 2, 
-            'depth': 6.0,
-            'one_hot_max_size': 2.0, 
-            'learning_rate': 0.1}
+        model.fit(
+            train.drop(['date', 'quantity'], axis=1),
+            train['quantity'],
+            verbose=False,
+            plot=False)
         
-        # clf.save_model(output_path, format="cbm")
+        
+        click.echo(f'Предсказываем на test')        
+        pred = model.predict(test.drop(['date', 'quantity'], axis=1))
+        mae = np.mean(np.abs(pred - test['quantity']))
+        bias = np.mean((pred - test['quantity']))
+        score = round(mae + abs(bias), 2)
+        mlflow.log_metrics({'MAE_bias': score})
 
-        signature = infer_signature(x_holdout, y_predicted)
 
-        mlflow.log_params(params)
-        mlflow.log_metrics(score)
-        mlflow.lightgbm.log_model(lgb_model=gbm,
-                                  artifact_path="catboost_model",
-                                  registered_model_name="forecast_catboost",
+        click.echo(f'Обучаемся всех данных')
+        model = CatBoostRegressor(
+            iterations=5000,
+            random_seed=42,
+            thread_count=-1,
+            loss_function="MAE",
+            eval_metric="MAE",
+            verbose=500,
+            **searched_params
+        )
+
+        model.fit(
+            df.drop(['date', 'quantity'], axis=1),
+            df['quantity'],
+            verbose=False,
+            plot=False)
+        
+        click.echo(f'Логируем модель')
+        signature = infer_signature(X, y)
+        mlflow.catboost.log_model(cb_model=model,
+                                  artifact_path="model_path",
+                                  registered_model_name="catboost_model",
                                   signature=signature)
-        
-        client = mlflow.MlflowClient(tracking_uri=MLFLOW_TRACKING_URI)
-        experiment = dict(mlflow.get_experiment_by_name('Forecaster'))
-        experiment_id = experiment['experiment_id']
-        df = mlflow.search_runs([experiment_id])
-        best_run_id = df.loc[0, 'run_id']
-        
-        path = client.download_artifacts(run_id=RUN_ID, path='dict_vectorizer.bin')
-        
 
+        mlflow.log_artifact(__file__)
+        model.save_model(output_path, format="cbm")
+        
 
 if __name__ == "__main__":
     train()

@@ -1,2 +1,14 @@
-ACCESS_KEY_ID = 
-SECRET_ACCESS_KEY = 
+ACCESS_KEY_ID=""
+SECRET_ACCESS_KEY=""
+ENDPOINT="https://storage.yandexcloud.net/"
+ACCESS_KEY="login"
+SECRET_KEY="password"
+AWS_ACCESS_KEY_ID = ""
+AWS_SECRET_ACCESS_KEY = ""
+AWS_DEFAULT_REGION = "ru-central1"
+MLFLOW_S3_ENDPOINT_URL=https://storage.yandexcloud.net/
+MLFLOW_TRACKING_URI=http://51.250.66.134:5000
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=mlflowdb
+AWS_S3_BUCKET=junk

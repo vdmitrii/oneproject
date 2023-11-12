@@ -5,7 +5,12 @@ from dotenv import load_dotenv
 import pandas as pd
 import click
 from botocore.exceptions import ClientError
+import mlflow
+from  mlflow.tracking import MlflowClient
 
+
+remote_server_uri = "http://0.0.0.0:5000"
+mlflow.set_tracking_uri(remote_server_uri) 
 
 @click.command()
 @click.argument("input_path", type=click.Path(exists=True))
@@ -13,7 +18,6 @@ def upload_model(input_path: str):
     bucket_name = 'junk'
     file_name = 'models/catboost_model.cbm'
     session = boto3.session.Session()
-
     ENDPOINT = "https://storage.yandexcloud.net"
 
     session = boto3.Session(
@@ -24,6 +28,14 @@ def upload_model(input_path: str):
     s3 = session.client("s3", endpoint_url=ENDPOINT)
     with open(file_name, "rb") as f:
             s3.upload_fileobj(f, bucket_name, "model/catboost_model.cbm")
+
+
+    client = MlflowClient()
+    model_name = 'catboost_model'
+    model_metadata = client.get_latest_versions(model_name, stages=["None"])
+    latest_model_version = model_metadata[0].version
+    click.echo(latest_model_version)
+
 
 
 if __name__ == "__main__":

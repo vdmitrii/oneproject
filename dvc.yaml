@@ -57,22 +57,23 @@ stages:
       - models/catboost_model.cbm
 
   predict:
-    cmd: python src/models/predict.py ${data.TEST_FILE_PATH} ${data.MODEL_FILE_PATH} ${data.SCORE_FILE_PATH}
+    cmd: python src/models/predict.py ${data.RAW_DATA_PATH} ${data.MODEL_FILE_PATH} ${data.PREDS_FILE_PATH}
     deps:
       - src/models/predict.py
       - models/catboost_model.cbm
+      - data/raw/data.csv
     params:
-      - data.TEST_FILE_PATH
-      - data.SCORE_FILE_PATH
+      - data.RAW_DATA_PATH
+      - data.PREDS_FILE_PATH
       - data.MODEL_FILE_PATH
     outs:
-      - reports/scores.csv
+      - data/predictions/preds.csv
 
   s3upload:
     cmd: python src/models/upload_model.py ${data.MODEL_FILE_PATH}
     deps:
       - src/models/upload_model.py
-      - models/catboost_model.cbm
+      - data/predictions/preds.csv
     params:
       - data.MODEL_FILE_PATH
     

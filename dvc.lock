@@ -25,8 +25,8 @@ stages:
     deps:
     - path: data/processed/data.csv
       hash: md5
-      md5: 088b01eca4b5846dc866f1fe37ec130f
-      size: 176070
+      md5: 250b6638261c16535fb0df518ee633c1
+      size: 144702
     - path: src/data/clean_data.py
       hash: md5
       md5: 41ef4c29f3fdb6c765f9b264e5876414
@@ -38,31 +38,31 @@ stages:
     outs:
     - path: data/processed/data_cleaned.csv
       hash: md5
-      md5: e6b595a68ca30b80b104ca9408312931
-      size: 196820
+      md5: 5bcd90b64f4f6b09c8a3f8876b70e9c1
+      size: 165452
   get_data:
-    cmd: python src/data/get_data.py data/raw/data.xlsx data/processed/data.csv
+    cmd: python src/data/get_data.py data/raw/data.csv data/processed/data.csv
     deps:
     - path: src/data/get_data.py
       hash: md5
-      md5: 8aa0eb952a45228cb7a3c45964f7ed9c
-      size: 1033
+      md5: 1309d3b6592dd5c6de65476c73900d6e
+      size: 564
     params:
       params.yaml:
         data.DATA_PATH: data/processed/data.csv
-        data.RAW_DATA_PATH: data/raw/data.xlsx
+        data.RAW_DATA_PATH: data/raw/data.csv
     outs:
     - path: data/processed/data.csv
       hash: md5
-      md5: 088b01eca4b5846dc866f1fe37ec130f
-      size: 176070
+      md5: 250b6638261c16535fb0df518ee633c1
+      size: 144702
   add_features:
     cmd: python src/features/add_features.py data/processed/data_cleaned.csv data/processed/data_featured.csv
     deps:
     - path: data/processed/data_cleaned.csv
       hash: md5
-      md5: e6b595a68ca30b80b104ca9408312931
-      size: 196820
+      md5: 5bcd90b64f4f6b09c8a3f8876b70e9c1
+      size: 165452
     - path: src/features/add_features.py
       hash: md5
       md5: b899854b2db68c12af89a893c1344647
@@ -93,7 +93,7 @@ stages:
         data.FEATURED_DATA_PATH: data/processed/data_featured.csv
         data.TEST_FILE_PATH: data/processed/test.csv
         data.TRAIN_FILE_PATH: data/processed/train.csv
-        prep.split_date: '2023-06-01'
+        prep.split_date: '2023-10-02'
     outs:
     - path: data/processed/test.csv
       hash: md5
@@ -112,8 +112,8 @@ stages:
       size: 536867
     - path: src/models/train.py
       hash: md5
-      md5: a6ebc20cb8eb52f4303f52254dbad085
-      size: 1074
+      md5: c11b1b71ed51754c7eaddd77e61a5547
+      size: 3742
     params:
       params.yaml:
         data.MODEL_FILE_PATH: models/catboost_model.cbm
@@ -121,41 +121,45 @@ stages:
     outs:
     - path: models/catboost_model.cbm
       hash: md5
-      md5: 5b2c1f302f28704c3836825b36a2acaf
-      size: 1086816
+      md5: 08d6cb80819489145b48db64d260429d
+      size: 1489048
   predict:
-    cmd: python src/models/predict.py data/processed/test.csv models/catboost_model.cbm
-      reports/scores.csv
+    cmd: python src/models/predict.py data/raw/data.csv models/catboost_model.cbm
+      data/predictions/preds.csv
     deps:
+    - path: data/raw/data.csv
+      hash: md5
+      md5: 8e383143bfb3ad2fa886aa0411b9849c
+      size: 155043
     - path: models/catboost_model.cbm
       hash: md5
-      md5: 5b2c1f302f28704c3836825b36a2acaf
-      size: 1086816
+      md5: 08d6cb80819489145b48db64d260429d
+      size: 1489048
     - path: src/models/predict.py
       hash: md5
-      md5: d2f94e13c4a1619418ed49ebe3ec72fd
-      size: 931
+      md5: 3d74d02419864f5d15081e8d19a3f224
+      size: 2260
     params:
       params.yaml:
         data.MODEL_FILE_PATH: models/catboost_model.cbm
-        data.SCORE_FILE_PATH: reports/scores.csv
-        data.TEST_FILE_PATH: data/processed/test.csv
+        data.PREDS_FILE_PATH: data/predictions/preds.csv
+        data.RAW_DATA_PATH: data/raw/data.csv
     outs:
-    - path: reports/scores.csv
+    - path: data/predictions/preds.csv
       hash: md5
-      md5: 0a5da269b6c0d20eb8057156d940343c
-      size: 47
+      md5: 235ae039191305647d845afc5ab9349d
+      size: 192830
   s3upload:
     cmd: python src/models/upload_model.py models/catboost_model.cbm
     deps:
-    - path: models/catboost_model.cbm
+    - path: data/predictions/preds.csv
       hash: md5
-      md5: 5b2c1f302f28704c3836825b36a2acaf
-      size: 1086816
+      md5: 235ae039191305647d845afc5ab9349d
+      size: 192830
     - path: src/models/upload_model.py
       hash: md5
-      md5: f4d867493bbc8e8ec8836416630e27ac
-      size: 845
+      md5: 7a49cb74cd074d9ba572c61c5878b9b9
+      size: 1219
     params:
       params.yaml:
         data.MODEL_FILE_PATH: models/catboost_model.cbm
